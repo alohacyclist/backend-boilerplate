@@ -19,6 +19,15 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  watchlist: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'Watchlist',
+  },
+  createdAt: { 
+    type: Date,
+    default: Date.now,
+    immutable: true,
+  },
 });
 
 const User = model("User", userSchema);

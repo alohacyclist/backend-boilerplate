@@ -2,23 +2,28 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
+const Watchlist = require("../models/Watchlist.model");
 
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-  try {
-    const passwordHash = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      firstName,
-      lastName,
-      email,
-      password: passwordHash,
-    });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json(error);
-  }
+  const { firstName, lastName, email, password, watchlist, createdAt } = req.body;
+    try {
+      const passwordHash = await bcrypt.hash(password, 10);
+      const user = await User.create({
+        firstName,
+        lastName,
+        email,
+        password: passwordHash,
+        createdAt
+      });
+      // create watchlist for this user
+      user.watchlist = await Watchlist.create({id: user._id})
+      await user.save();
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json(error);
+    }
 });
 
 router.post("/login", async (req, res) => {
