@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const Watchlist = require("../models/Watchlist.model");
+const { auth } = require('../middlewares/jwt.middleware')
 
 const router = express.Router();
 
@@ -26,6 +27,13 @@ router.post("/signup", async (req, res) => {
     }
 });
 
+
+router.get("/verify", auth, (req, res) => {
+  res.status(200).json({
+    user: req.jwtPayload.user,
+  })
+})
+
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
@@ -38,7 +46,7 @@ router.post("/login", async (req, res) => {
         };
         const token = jwt.sign(payload, process.env.JWT_SECRET, {
           algorithm: "HS256",
-          expiresIn: "6h",
+          expiresIn: "3h",
         });
         res.status(200).json({
           user,
@@ -54,5 +62,6 @@ router.post("/login", async (req, res) => {
     res.status(500).json(error);
   }
 });
+
 
 module.exports = router;

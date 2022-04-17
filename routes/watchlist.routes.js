@@ -19,7 +19,7 @@ router.get("/", auth, async (req, res) => {
 
 // get a watchlist
 router.get("/:id", auth, async (req, res) => {
-    const watchlist = await Watchlist.findById(req.params.id).populate([{
+    const watchlist = await Watchlist.findOne({id: req.params.id}).populate([{
         path: 'id',
         model: 'User',
     }, {
@@ -34,18 +34,23 @@ router.get("/:id", auth, async (req, res) => {
 
 // vote/like/watch a watchlist
 router.post("/:id", auth, async (req, res) => {
-    const user = req.jwtPayload.user._id
-    const watchlist = await Watchlist.findById(req.params.id).populate('votes')
-    watchlist.votes.push(user)
-    await watchlist.save()
+    const user = await User.findById(req.jwtPayload.user._id)
+    const watchlist = await Watchlist.find({id: req.params.id}).populate('votes')
+    console.log(watchlist[0].votes)
+    watchlist[0].votes.push(user._id)
+    await watchlist[0].save()
     res.status(200).json(watchlist)
 })
 
 // remove coin from watchlist
-/* router.delete("/:id/coin/:id", async (req, res) => {
-    const { id } = req.params;
-    const coin = await Coin.findByIdAndDelete(id);
-    res.status(200).json(coin);
-  }); */
+router.post("/:id/coin", auth, async (req, res) => {
+    const user = await User.findById(req.jwtPayload.user._id).populate('watchlist')
+    const watchlist = await Watchlist.findOne({_id: user.watchlist}).populate('coins')
+    watchlist.coins.remove(req.body.id)
+    await watchlist.save()
+    await user.save()
+    const coin = await Coin.findByIdAndDelete(req.body.id)
+    res.status(200).json(watchlist)
+  });
 
 module.exports = router;

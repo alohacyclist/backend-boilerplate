@@ -7,8 +7,8 @@ const { auth } = require("../middlewares/jwt.middleware");
 const router = express.Router()
 
 // get user profile
-router.get("/:id", auth, async (req, res) => {
-    const user = await User.findById(req.params.id).populate([{
+router.get("/profile", auth, async (req, res) => {
+    const user = await User.findById(req.jwtPayload.user).populate([{
         path: 'watchlist',
         model: 'Watchlist',
     }]);
