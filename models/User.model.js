@@ -15,6 +15,13 @@ const userSchema = new Schema({
     required: true,
     unique: true,
   },
+  status: {
+    type: Boolean,
+    default: false,
+  },
+  confirmationCode: {
+    type: String
+  },
   password: {
     type: String,
     required: true,

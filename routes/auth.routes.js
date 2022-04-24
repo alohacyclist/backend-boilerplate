@@ -4,20 +4,28 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User.model");
 const Watchlist = require("../models/Watchlist.model");
 const { auth } = require('../middlewares/jwt.middleware')
+const { v4: uuidv4 } = require('uuid')
+const sendEmail = require('../utils/sendEmail')
 
 const router = express.Router();
 
 router.post("/signup", async (req, res) => {
+  // create unique confirmation code
+  const confirmationCode = uuidv4()
+  // link that is send to the user
+  const confirmationLink = `http://localhost:4000/auth/${confirmationCode}`
   const { firstName, lastName, email, password, watchlist, createdAt } = req.body;
     try {
       const passwordHash = await bcrypt.hash(password, 10);
-      const user = await User.create({
+      const user = await User.create({ 
         firstName,
         lastName,
         email,
         password: passwordHash,
-        createdAt
+        createdAt,
+        confirmationCode: confirmationCode 
       });
+      sendEmail(user.email, 'Confirm your Blocker Account', confirmationLink)
       // create watchlist for this user
       user.watchlist = await Watchlist.create({id: user._id})
       await user.save();
@@ -27,6 +35,19 @@ router.post("/signup", async (req, res) => {
     }
 });
 
+router.get('/:confirmationCode', async (req, res) => {
+  const user = await User.findOne({confirmationCode: req.params.confirmationCode})
+  try {
+    if(user) {
+      user.status = true
+      await user.save()
+      console.log(user, 'confirmation successful')
+      res.redirect(`${process.env.BLOCKER_PAGE}`)
+    }
+  } catch (error) {
+    res.status(401).json(error)
+  }
+})
 
 router.get("/verify", auth, (req, res) => {
   res.status(200).json({
@@ -39,7 +60,8 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email });
     if (user) {
-      const passwordCorrect = await bcrypt.compare(password, user.password);
+      if (user.status === true) {
+        const passwordCorrect = await bcrypt.compare(password, user.password);
       if (passwordCorrect) {
         const payload = {
           user,
@@ -56,12 +78,12 @@ router.post("/login", async (req, res) => {
         res.status(401).json({ message: "Email or password are incorrect" });
       }
     } else {
-      res.status(401).json({ message: "Email or password are incorrect" });
+      res.status(401).json({ message: "Account not verified. Check your mails for activation link." });
     }
-  } catch (error) {
-    res.status(500).json(error);
-  }
+      }
+        } catch (error) {
+            res.status(500).json(error);
+        }
 });
-
 
 module.exports = router;
