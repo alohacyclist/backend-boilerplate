@@ -6,7 +6,6 @@ const { auth } = require("../middlewares/jwt.middleware");
 
 const router = express.Router()
 
-// check if coin is in userwatchlist
 // edit coin model to add fractions of a coin (BONUS)
 
 

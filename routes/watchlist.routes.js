@@ -37,11 +37,14 @@ router.get("/:id", auth, async (req, res) => {
 router.post("/:id", auth, async (req, res) => {
     const user = await User.findById(req.jwtPayload.user._id)
     const watchlist = await Watchlist.findById(req.params.id).populate('votes')
-    // check if user already voted 
-    const voteCheck = await Watchlist.findOne({votes: user})
-    voteCheck?.votes?.includes(user._id) ? null : watchlist.votes.push(user._id)
-    await watchlist.save()
-    res.status(200).json(watchlist)
+    // check if watchlist belongs to user -> cannot like own watchlist
+    if(watchlist.id != user._id) {
+        // check if user already voted 
+        const voteCheck = await Watchlist.findOne({votes: user})
+        voteCheck?.votes?.includes(user._id) ? null : watchlist.votes.push(user._id)
+        await watchlist.save()
+        res.status(200).json(watchlist)
+    }
 })
 
 // check watchlist for coins

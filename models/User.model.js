@@ -26,6 +26,9 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+  resetPasswordToken: {
+    type: String,
+  },
   watchlist: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'Watchlist',
