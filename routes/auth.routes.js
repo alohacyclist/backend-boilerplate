@@ -153,10 +153,6 @@ router.post(('/password-reset/:userId'), async (req, res) => {
 })
 
 router.post("/google-login", async (req, res) => {
-    // create unique confirmation code
-    /* const confirmationCode = uuidv4() */
-    // link that is send to the user
-    /* const confirmationLink = `http://localhost:4000/auth/${confirmationCode}` */
   const {firstName, lastName, email} = req.body
   try {
     const user = await User.findOne( {email} );
@@ -182,7 +178,6 @@ router.post("/google-login", async (req, res) => {
         email,
         status: true,
         password: passwordHash,
-        /* confirmationCode: confirmationCode */ 
       })
       console.log('new google user created:', user)
 
@@ -198,7 +193,7 @@ router.post("/google-login", async (req, res) => {
         algorithm: "HS256",
         expiresIn: "3h",
       });
-
+      
       res.status(200).json({
         user,
         token
