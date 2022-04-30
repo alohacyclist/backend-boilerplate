@@ -7,7 +7,7 @@ const e = require("express");
 const router = express.Router()
 
 // get list of all user watchlists
-router.get("/", auth, async (req, res) => {
+router.get("/", async (req, res) => {
     const watchlists = await Watchlist.find().populate([{
         path: 'id',
         model: 'User',

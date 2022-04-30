@@ -16,6 +16,9 @@ router.post("/signup", async (req, res) => {
   // link that is send to the user
   const confirmationLink = `http://localhost:4000/auth/${confirmationCode}`
   const { firstName, lastName, email, password, createdAt } = req.body;
+  const checkUser = await User.findOne({email: req.body.email})
+  if(checkUser) res.status(200).json(checkUser)
+  if(!checkUser) {
     try {
       const passwordHash = await bcrypt.hash(password, 10);
       const user = await User.create({ 
@@ -34,6 +37,7 @@ router.post("/signup", async (req, res) => {
     } catch (error) {
       res.status(500).json(error);
     }
+  }
 });
 
 router.get('/:confirmationCode', async (req, res) => {
