@@ -54,7 +54,7 @@ router.get('/:confirmationCode', async (req, res) => {
   }
 })
 
-router.get("/verify", auth, (req, res) => {
+router.post("/verify", auth, (req, res) => {
   res.status(200).json({
     user: req.jwtPayload.user,
   })
