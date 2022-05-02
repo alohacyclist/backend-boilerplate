@@ -94,6 +94,7 @@ router.post("/login", async (req, res) => {
         }
 });
 
+// route to request and create unique token to set a new password
 router.post('/password-reset', async (req, res) => {
   if(req.body.email === '')  res.status(400).send('Please enter your E-Mail.')
   const user = await User.findOne({ email: req.body.email });
