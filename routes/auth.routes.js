@@ -14,7 +14,7 @@ router.post("/signup", async (req, res) => {
   // create unique confirmation code
   const confirmationCode = uuidv4()
   // link that is send to the user
-  const confirmationLink = `https://blockerapp.herokuapp.com/auth/${confirmationCode}`
+  const confirmationLink = `${process.env.BLOCKER_PAGE}/auth/${confirmationCode}`
   const { firstName, lastName, email, password, createdAt } = req.body;
   const checkUser = await User.findOne({email: req.body.email})
   if(checkUser) res.status(200).json(checkUser)
