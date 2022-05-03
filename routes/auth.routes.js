@@ -96,6 +96,7 @@ router.post("/login", async (req, res) => {
 
 //delete account (and associated watchlist)
 router.post('/delete', async (req,res) => {
+  console.log(req.body)
   const user = await User.findByIdAndDelete(req.body._id, (err, user) => {
     err ? console.log('error:', err) :
     console.log('user deleted:', user)
