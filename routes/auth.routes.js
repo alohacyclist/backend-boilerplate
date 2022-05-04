@@ -98,6 +98,7 @@ router.post("/login", async (req, res) => {
 router.post('/delete', async (req,res) => {
   const { user } = req.body
   await User.findByIdAndDelete(user._id)
+  await Watchlist.findOneAndDelete({id: user._id})
 })
 
 // route to request and create unique token to set a new password
