@@ -44,6 +44,8 @@ router.post("/:id", auth, async (req, res) => {
         voteCheck?.votes?.includes(user._id) ? null : watchlist.votes.push(user._id)
         await watchlist.save()
         res.status(200).json(watchlist)
+    } else {
+        console.log('already voted / canot vote for own watchlist')
     }
 })
 
