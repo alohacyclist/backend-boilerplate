@@ -12,10 +12,19 @@ router.get("/profile", auth, async (req, res) => {
     res.status(200).json(user);
   });
 
-router.post('/profile', auth, async (req, res) => {
-  const {email, password} = req.body
+//edit profile email
+router.post('/profile-em', auth, async (req, res) => {
+  const { email } = req.body
+  const user = await User.findByIdAndUpdate(req.jwtPayload.user, {email: email}, {new: true})
+  await user.save()
+  res.status(200).json(user)
+})
+
+//edit profile password
+router.post('/profile-pw', auth, async (req, res) => {
+  const { password } = req.body
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.findByIdAndUpdate(req.jwtPayload.user, {email: email, password: passwordHash}, {new: true})
+  const user = await User.findByIdAndUpdate(req.jwtPayload.user, {password: passwordHash}, {new: true})
   await user.save()
   res.status(200).json(user)
 })

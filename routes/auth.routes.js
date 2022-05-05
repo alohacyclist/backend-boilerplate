@@ -81,12 +81,9 @@ router.post("/login", async (req, res) => {
         });
       } else {
         res.status(401).json({ message: "Email or password are incorrect" });
-        /* console.log('mail/pw incorrect') */
       }
     } else {
       res.status(401).json({ message: "Account not verified. Check your mails for activation link." });
-      /* console.log('unverified account') */
-
     }
       }
         } catch (error) {
@@ -95,7 +92,7 @@ router.post("/login", async (req, res) => {
 });
 
 //delete account (and associated watchlist)
-router.post('/delete', async (req,res) => {
+router.post('/delete', async (req, res) => {
   const { user } = req.body
   await User.findByIdAndDelete(user._id)
   await Watchlist.findOneAndDelete({id: user._id})
