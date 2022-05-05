@@ -97,6 +97,7 @@ router.post('/delete', async (req, res) => {
   try {
     await Watchlist.findOneAndDelete({id: user._id})
     await User.findByIdAndDelete(user._id)
+    res.status(200).json('user deleted')
   } catch (err) {
     res.status(500).json(err)
   }
