@@ -94,8 +94,13 @@ router.post("/login", async (req, res) => {
 //delete account (and associated watchlist)
 router.post('/delete', async (req, res) => {
   const { user } = req.body
-  await User.findByIdAndDelete(user._id)
-  await Watchlist.findOneAndDelete({id: user._id})
+  try {
+    await Watchlist.findOneAndDelete({id: user._id})
+    await User.findByIdAndDelete(user._id)
+  } catch (err) {
+    res.status(500).json(err)
+  }
+  
 })
 
 // route to request and create unique token to set a new password
@@ -119,7 +124,7 @@ router.post('/password-reset', async (req, res) => {
 
         res.status(200).send(`Reset-Password-Link sent to ${user.email}.`);
     } catch (error) {
-        res.send("An error occured");
+        res.status(500).send("An error occured");
         console.log(error);
     }
   })
