@@ -119,7 +119,7 @@ router.post('/password-reset', async (req, res) => {
             await token.save()
         }
 
-        const link = `https://blocker.netlify.com/auth/reset-password/${user._id}/${token.token}`;
+        const link = `https://blockr.netlify.com/auth/reset-password/${user._id}/${token.token}`;
         await sendEmail(user.email, "Password reset", link);
 
         res.status(200).json(`Reset-Password-Link sent to ${user.email}.`);
