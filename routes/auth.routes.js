@@ -46,7 +46,6 @@ router.get('/:confirmationCode', async (req, res) => {
     if(user) {
       user.status = true
       await user.save()
-      console.log(user, 'confirmation successful')
       res.redirect(`${process.env.BLOCKER_PAGE}`)
     }
   } catch (error) {
@@ -106,7 +105,7 @@ router.post('/delete', async (req, res) => {
 
 // route to request and create unique token to set a new password
 router.post('/password-reset', async (req, res) => {
-  if(req.body.email === '')  res.status(400).send('Please enter your E-Mail.')
+  if(req.body.email === '')  res.status(400).json('Please enter your E-Mail.')
   const user = await User.findOne({ email: req.body.email });
     try{
         if (!user) return res.status(400).send("No user with that E-Mail.");
@@ -120,12 +119,12 @@ router.post('/password-reset', async (req, res) => {
             await token.save()
         }
 
-        const link = `https://blockerapp.herokuapp.com/auth/reset-password/${user._id}/${token.token}`;
+        const link = `https://blocker.netlify.com/auth/reset-password/${user._id}/${token.token}`;
         await sendEmail(user.email, "Password reset", link);
 
-        res.status(200).send(`Reset-Password-Link sent to ${user.email}.`);
+        res.status(200).json(`Reset-Password-Link sent to ${user.email}.`);
     } catch (error) {
-        res.status(500).send("An error occured");
+        res.status(500).json("An error occured");
         console.log(error);
     }
   })
@@ -140,15 +139,14 @@ router.post('/password-reset', async (req, res) => {
           userId: user._id,
           token: req.params.resetPasswordToken,
       });
-      if (!token) return res.status(400).send("Invalid link or expired");
-
-      console.log('user and token:', user, token)
+      if (!token) return res.status(400).json("Invalid link or expired");
       res.status(200).send('All good!')
   } catch (error) {
       res.send("Token invalid or expired.");
       console.log(error);
   }
   })
+
 
 router.post(('/password-reset/:userId'), async (req, res) => {
   const passwordHash = await bcrypt.hash(req.body.password, 10)
@@ -190,7 +188,6 @@ router.post("/google-login", async (req, res) => {
         status: true,
         password: passwordHash,
       })
-      console.log('new google user created:', user)
 
       sendEmail(user.email, 'Welcome to Blocker', 'Please go to your profile and set a password.')
 
